@@ -1,0 +1,6 @@
+# Pull base image
+
+FROM mongo
+
+COPY --chown=root:root ./mongodb/scripts /docker-entrypoint-initdb.d
+chmod a+x -R /docker-entrypoint-initdb.d
