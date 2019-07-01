@@ -4,12 +4,12 @@ services:
 
    mongo:
      restart: always
-     build:
-       context: .
-       dockerfile: Dockerfile-mongo
+     ports:
+       - 27017:27017
+     image: mongo
      volumes:
        - ./mongodb/data:/data/db
-     hostname: mongodb
+     hostname: mongo
      environment:
        MONGO_INITDB_ROOT_USERNAME: root
        MONGO_INITDB_ROOT_PASSWORD: breacmpa
@@ -23,3 +23,127 @@ services:
      environment:
        ME_CONFIG_MONGODB_ADMINUSERNAME: root
        ME_CONFIG_MONGODB_ADMINPASSWORD: breacmpa
+
+   redis:
+     image: redis:4.0.5-alpine
+     hostname: redis
+     ports:
+       - 6379:6379
+     restart: always
+
+   worker-extract:
+     depends_on:
+       - redis
+       - mongo
+     image: workflow-worker
+     restart: always
+     volumes:
+       - type: volume
+         source: data-volume
+         target: /srv/app/data
+
+     environment:
+       WORKER_QUEUES: extract
+       WORKER_POOL: eventlet
+       WORKER_CONCURRENCY: 20
+       WORKER_NAME: extract
+       MONGO_DATABASE: workflowdb
+       MONGO_USERNAME: root
+       MONGO_PASSWORD: breacmpa
+       MONGO_HOST: mongo
+       DATA_PATH: /srv/app/data
+     command: worker
+
+   worker-transform:
+     depends_on:
+       - redis
+       - mongo
+     image: workflow-worker
+     restart: always
+     volumes:
+       - type: volume
+         source: data-volume
+         target: /srv/app/data
+
+     environment:
+       WORKER_QUEUES: transform
+       WORKER_POOL: prefork
+       WORKER_CONCURRENCY: 2
+       WORKER_NAME: transform
+       MONGO_DATABASE: workflowdb
+       MONGO_USERNAME: root
+       MONGO_PASSWORD: breacmpa
+       MONGO_HOST: mongo
+       DATA_PATH: /srv/app/data
+     command: worker
+
+   worker-load:
+     depends_on:
+       - redis
+       - mongo
+     image: workflow-worker
+     restart: always
+     volumes:
+       - type: volume
+         source: data-volume
+         target: /srv/app/data
+
+     environment:
+       WORKER_QUEUES: load
+       WORKER_POOL: prefork
+       WORKER_CONCURRENCY: 2
+       WORKER_NAME: load
+       MONGO_DATABASE: workflowdb
+       MONGO_USERNAME: root
+       MONGO_PASSWORD: breacmpa
+       MONGO_HOST: mongo
+       DATA_PATH: /srv/app/data
+     command: worker
+
+   flower:
+     depends_on:
+       - redis
+       - worker-extract
+       - worker-load
+       - worker-transform
+     image: workflow-worker
+     restart: always
+     ports:
+       - 5555:5555
+     command: flower
+
+   flask:
+     depends_on:
+       - mongo
+     image: workflow-flask
+     restart: always
+     ports:
+       - 5000:5000
+     environment:
+       MONGO_DATABASE: workflowdb
+       MONGO_USERNAME: root
+       MONGO_PASSWORD: breacmpa
+       MONGO_HOST: mongo
+
+     command: flask
+
+   workflow:
+     depends_on:
+       - redis
+       - mongo
+       - worker-extract
+       - worker-load
+       - worker-transform
+     image: workflow-worker
+     restart: always
+     environment:
+       MONGO_DATABASE: workflowdb
+       MONGO_USERNAME: root
+       MONGO_PASSWORD: breacmpa
+       MONGO_HOST: mongo
+       DATA_PATH: /srv/app/data
+
+     command: tail -f /dev/null
+
+volumes:
+ data-volume:

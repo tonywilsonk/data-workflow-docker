@@ -1,0 +1,24 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+pymongo = "*"
+flask = "*"
+dnspython = "*"
+eventlet = "*"
+flower = "*"
+mongoengine = "*"
+future = "*"
+redis = "*"
+requests = "*"
+pillow = "*"
+futures = "*"
+numpy = "*"
+gunicorn = "*"
+
+[requires]
+python_version = "3.6"
