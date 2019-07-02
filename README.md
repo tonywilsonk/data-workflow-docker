@@ -15,15 +15,15 @@ For the application purposes, we also build a flask api to visualize images stor
 
 Apache Airflow is a great tool. The main idea behind the solution with airflow is to buid a dynamic worflow based on the number of images to process. The main task () create for each image to process a subtack, ETL to do.
 
-![alt text](http://url/to/img.png)
+![Main Task](https://github.com/tonywilsonk/data-workflow-docker/blob/master/big.PNG)
 
 The main task(Workflow)
 
-![alt text](http://url/to/img.png)
+![Etl Task](https://github.com/tonywilsonk/data-workflow-docker/blob/master/etl.PNG)
 
 The subtask Workflow (ETL)
 
-![alt text](http://url/to/img.png)
+![After Running](https://github.com/tonywilsonk/data-workflow-docker/blob/master/success.PNG)
 
 All done with success :) .
 
