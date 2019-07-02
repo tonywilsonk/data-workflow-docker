@@ -11,6 +11,24 @@ The application uses celery to make all the stuf. We use Redis as how broker and
 
 For the application purposes, we also build a flask api to visualize images store in mongo db and also retrieve statistics about execution errors.
 
+## A solution with Apache Airflow
+
+Apache Airflow is a great tool. The main idea behind the solution with airflow is to buid a dynamic worflow based on the number of images to process. The main task () create for each image to process a subtack, ETL to do.
+
+![alt text](http://url/to/img.png)
+
+The main task(Workflow)
+
+![alt text](http://url/to/img.png)
+
+The subtask Workflow (ETL)
+
+![alt text](http://url/to/img.png)
+
+All done with success :) .
+
+Refer to makefile for how to run the solution with airflow. We are able to access to airflow at http://localhost:8080 and run the DAG.
+
 ## How to run all this stuf
 
 using make, all become more simple :).
