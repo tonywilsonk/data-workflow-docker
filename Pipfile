@@ -19,6 +19,7 @@ pillow = "*"
 futures = "*"
 numpy = "*"
 gunicorn = "*"
+apache-airflow = "*"
 
 [requires]
 python_version = "3.6"
